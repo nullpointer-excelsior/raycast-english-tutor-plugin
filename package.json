@@ -13,21 +13,37 @@
     "Productivity"
   ],
   "license": "MIT",
+  "preferences": [
+    {
+      "name": "openaiApiKey",
+      "type": "password",
+      "required": true,
+      "title": "OpenAI API Key",
+      "description": "Required for Text-to-Speech via OpenAI TTS"
+    }
+  ],
   "commands": [
     {
       "name": "english-tutor",
       "title": "English tutor",
       "description": "Lear english",
       "mode": "view"
+    },
+    {
+      "name": "text-to-speech",
+      "title": "Text to Speech",
+      "description": "Convert text to speech using OpenAI TTS",
+      "mode": "view"
     }
   ],
   "dependencies": {
     "@raycast/api": "^1.104.15",
-    "@raycast/utils": "^1.17.0"
+    "@raycast/utils": "^1.17.0",
+    "openai": "^6.39.0"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^2.0.4",
-    "@types/node": "22.19.17",
+    "@types/node": "^22.19.17",
     "@types/react": "19.0.10",
     "eslint": "^9.22.0",
     "prettier": "^3.5.3",
