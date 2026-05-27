@@ -1,4 +1,14 @@
-import { Action, ActionPanel, Detail, Form, getPreferenceValues, Icon, showToast, Toast, useNavigation } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Detail,
+  Form,
+  getPreferenceValues,
+  Icon,
+  showToast,
+  Toast,
+  useNavigation,
+} from "@raycast/api";
 import { useState, useEffect, useRef } from "react";
 import OpenAI, { APIError } from "openai";
 import * as fs from "node:fs";
@@ -159,7 +169,7 @@ export default function TextToSpeechCommand() {
         translatedText={translatedText}
         enableSpeech={values.enableSpeech}
         openai={openai}
-      />
+      />,
     );
   }
 
@@ -172,12 +182,7 @@ export default function TextToSpeechCommand() {
       }
     >
       <Form.TextArea id="ttsInput" title="Text" placeholder="Enter text to translate..." />
-      <Form.Checkbox
-        id="enableSpeech"
-        label="Enable Speech"
-        value={enableSpeech}
-        onChange={setEnableSpeech}
-      />
+      <Form.Checkbox id="enableSpeech" label="Enable Speech" value={enableSpeech} onChange={setEnableSpeech} />
     </Form>
   );
 }
