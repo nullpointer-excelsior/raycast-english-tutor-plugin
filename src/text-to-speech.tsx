@@ -1,4 +1,5 @@
 import { Action, ActionPanel, Form, getPreferenceValues, showToast, Toast } from "@raycast/api";
+import { useState } from "react";
 import OpenAI, { APIError } from "openai";
 import * as fs from "node:fs";
 import * as os from "node:os";
@@ -22,6 +23,7 @@ interface Preferences {
 
 interface TtsFormValues {
   ttsInput: string;
+  enableSpeech: boolean;
 }
 
 function playAudio(filePath: string): Promise<void> {
@@ -74,6 +76,12 @@ async function handleSpeak(values: TtsFormValues): Promise<void> {
     throw err;
   }
 
+  if (!values.enableSpeech) {
+    toast.style = Toast.Style.Success;
+    toast.title = translatedText;
+    return;
+  }
+
   toast.title = "Generating speech...";
 
   const tmpFilePath = path.join(os.tmpdir(), `tts-${Date.now()}.mp3`);
@@ -119,6 +127,8 @@ async function handleSpeak(values: TtsFormValues): Promise<void> {
 }
 
 export default function TextToSpeechCommand() {
+  const [enableSpeech, setEnableSpeech] = useState(true);
+
   return (
     <Form
       actions={
@@ -128,6 +138,12 @@ export default function TextToSpeechCommand() {
       }
     >
       <Form.TextArea id="ttsInput" title="Text" placeholder="Enter text to speak..." />
+      <Form.Checkbox
+        id="enableSpeech"
+        label="Enable Speech"
+        value={enableSpeech}
+        onChange={setEnableSpeech}
+      />
     </Form>
   );
 }
