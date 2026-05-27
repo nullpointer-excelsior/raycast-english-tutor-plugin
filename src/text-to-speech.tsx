@@ -1,5 +1,5 @@
-import { Action, ActionPanel, Form, getPreferenceValues, showToast, Toast } from "@raycast/api";
-import { useState } from "react";
+import { Action, ActionPanel, Detail, Form, getPreferenceValues, showToast, Toast, useNavigation } from "@raycast/api";
+import { useState, useEffect, useRef } from "react";
 import OpenAI, { APIError } from "openai";
 import * as fs from "node:fs";
 import * as os from "node:os";
@@ -53,91 +53,125 @@ async function translateText(openai: OpenAI, text: string): Promise<string> {
   return completion.choices[0].message.content ?? text;
 }
 
-async function handleSpeak(values: TtsFormValues): Promise<void> {
-  if (values.ttsInput.length > TTS_MAX_CHARS) {
-    await showToast({ style: Toast.Style.Failure, title: "Text too long (max 4096 characters)." });
-    return;
+interface TranslationDetailProps {
+  originalText: string;
+  translatedText: string;
+  enableSpeech: boolean;
+  openai: OpenAI;
+}
+
+function TranslationDetail({ originalText, translatedText, enableSpeech, openai }: TranslationDetailProps) {
+  const markdown = `## Translation\n\n${translatedText}\n\n---\n\n**Original:** ${originalText}`;
+  const hasPlayedRef = useRef(false);
+
+  async function handlePlaySpeech() {
+    const toast = await showToast({ style: Toast.Style.Animated, title: "Generating speech..." });
+    const tmpFilePath = path.join(os.tmpdir(), `tts-${Date.now()}.mp3`);
+
+    try {
+      let response;
+      try {
+        response = await openai.audio.speech.create({
+          model: TTS_MODEL,
+          voice: TTS_VOICE as Parameters<typeof openai.audio.speech.create>[0]["voice"],
+          response_format: TTS_RESPONSE_FORMAT,
+          input: translatedText,
+        });
+      } catch (err) {
+        if (err instanceof APIError) {
+          toast.style = Toast.Style.Failure;
+          toast.title = err.status === 401 ? "Invalid OpenAI API Key. Check your preferences." : err.message;
+          return;
+        }
+        throw err;
+      }
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+      fs.writeFileSync(tmpFilePath, buffer);
+
+      toast.style = Toast.Style.Success;
+      toast.title = "Playing with Marin's voice...";
+
+      try {
+        await playAudio(tmpFilePath);
+      } catch {
+        toast.style = Toast.Style.Failure;
+        toast.title = "Failed to play audio.";
+      }
+    } finally {
+      fs.rmSync(tmpFilePath, { force: true });
+    }
   }
 
-  const toast = await showToast({ style: Toast.Style.Animated, title: "Translating text..." });
+  useEffect(() => {
+    if (enableSpeech && !hasPlayedRef.current) {
+      hasPlayedRef.current = true;
+      handlePlaySpeech();
+    }
+  }, []);
 
-  const { openaiApiKey } = getPreferenceValues<Preferences>();
-  const openai = new OpenAI({ apiKey: openaiApiKey });
+  return (
+    <Detail
+      markdown={markdown}
+      actions={
+        <ActionPanel>
+          <Action.CopyToClipboard title="Copy Translation" content={translatedText} />
+          <Action title="Play Speech" onAction={handlePlaySpeech} />
+        </ActionPanel>
+      }
+    />
+  );
+}
 
-  let translatedText: string;
-  try {
-    translatedText = await translateText(openai, values.ttsInput);
-  } catch (err) {
-    if (err instanceof APIError) {
-      toast.style = Toast.Style.Failure;
-      toast.title = err.status === 401 ? "Invalid OpenAI API Key. Check your preferences." : err.message;
+export default function TextToSpeechCommand() {
+  const [enableSpeech, setEnableSpeech] = useState(true);
+  const { push } = useNavigation();
+
+  async function handleSubmit(values: TtsFormValues) {
+    if (values.ttsInput.length > TTS_MAX_CHARS) {
+      await showToast({ style: Toast.Style.Failure, title: "Text too long (max 4096 characters)." });
       return;
     }
-    throw err;
-  }
 
-  if (!values.enableSpeech) {
-    toast.style = Toast.Style.Success;
-    toast.title = translatedText;
-    return;
-  }
+    const toast = await showToast({ style: Toast.Style.Animated, title: "Translating text..." });
 
-  toast.title = "Generating speech...";
+    const { openaiApiKey } = getPreferenceValues<Preferences>();
+    const openai = new OpenAI({ apiKey: openaiApiKey });
 
-  const tmpFilePath = path.join(os.tmpdir(), `tts-${Date.now()}.mp3`);
-
-  try {
-    let response;
+    let translatedText: string;
     try {
-      response = await openai.audio.speech.create({
-        model: TTS_MODEL,
-        voice: TTS_VOICE as Parameters<typeof openai.audio.speech.create>[0]["voice"],
-        response_format: TTS_RESPONSE_FORMAT,
-        input: translatedText,
-      });
+      translatedText = await translateText(openai, values.ttsInput);
     } catch (err) {
       if (err instanceof APIError) {
-        if (err.status === 401) {
-          toast.style = Toast.Style.Failure;
-          toast.title = "Invalid OpenAI API Key. Check your preferences.";
-        } else {
-          toast.style = Toast.Style.Failure;
-          toast.title = err.message;
-        }
+        toast.style = Toast.Style.Failure;
+        toast.title = err.status === 401 ? "Invalid OpenAI API Key. Check your preferences." : err.message;
         return;
       }
       throw err;
     }
 
-    const buffer = Buffer.from(await response.arrayBuffer());
-    fs.writeFileSync(tmpFilePath, buffer);
-
     toast.style = Toast.Style.Success;
-    toast.title = "Playing with Marin's voice...";
+    toast.title = "Translation ready";
 
-    try {
-      await playAudio(tmpFilePath);
-    } catch {
-      toast.style = Toast.Style.Failure;
-      toast.title = "Failed to play audio.";
-    }
-  } finally {
-    fs.rmSync(tmpFilePath, { force: true });
+    push(
+      <TranslationDetail
+        originalText={values.ttsInput}
+        translatedText={translatedText}
+        enableSpeech={values.enableSpeech}
+        openai={openai}
+      />
+    );
   }
-}
-
-export default function TextToSpeechCommand() {
-  const [enableSpeech, setEnableSpeech] = useState(true);
 
   return (
     <Form
       actions={
         <ActionPanel>
-          <Action.SubmitForm title="Speak" onSubmit={handleSpeak} />
+          <Action.SubmitForm title="Translate" onSubmit={handleSubmit} />
         </ActionPanel>
       }
     >
-      <Form.TextArea id="ttsInput" title="Text" placeholder="Enter text to speak..." />
+      <Form.TextArea id="ttsInput" title="Text" placeholder="Enter text to translate..." />
       <Form.Checkbox
         id="enableSpeech"
         label="Enable Speech"
