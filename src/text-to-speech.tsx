@@ -9,6 +9,12 @@ const TTS_MODEL = "gpt-4o-mini-tts";
 const TTS_VOICE = "marin";
 const TTS_RESPONSE_FORMAT = "mp3";
 const TTS_MAX_CHARS = 4096;
+const TRANSLATION_MODEL = "gpt-4.1-nano";
+
+const DETECT_AND_TRANSLATE_PROMPT = `You are a translation assistant. Detect the language of the given text.
+- If it is in English, translate it to Spanish.
+- If it is in Spanish, translate it to English.
+Return ONLY the translated text, with no explanations or extra content.`;
 
 interface Preferences {
   openaiApiKey: string;
@@ -34,16 +40,41 @@ function playAudio(filePath: string): Promise<void> {
   });
 }
 
+async function translateText(openai: OpenAI, text: string): Promise<string> {
+  const completion = await openai.chat.completions.create({
+    model: TRANSLATION_MODEL,
+    messages: [
+      { role: "system", content: DETECT_AND_TRANSLATE_PROMPT },
+      { role: "user", content: text },
+    ],
+  });
+  return completion.choices[0].message.content ?? text;
+}
+
 async function handleSpeak(values: TtsFormValues): Promise<void> {
   if (values.ttsInput.length > TTS_MAX_CHARS) {
     await showToast({ style: Toast.Style.Failure, title: "Text too long (max 4096 characters)." });
     return;
   }
 
-  const toast = await showToast({ style: Toast.Style.Animated, title: "Generating speech..." });
+  const toast = await showToast({ style: Toast.Style.Animated, title: "Translating text..." });
 
   const { openaiApiKey } = getPreferenceValues<Preferences>();
   const openai = new OpenAI({ apiKey: openaiApiKey });
+
+  let translatedText: string;
+  try {
+    translatedText = await translateText(openai, values.ttsInput);
+  } catch (err) {
+    if (err instanceof APIError) {
+      toast.style = Toast.Style.Failure;
+      toast.title = err.status === 401 ? "Invalid OpenAI API Key. Check your preferences." : err.message;
+      return;
+    }
+    throw err;
+  }
+
+  toast.title = "Generating speech...";
 
   const tmpFilePath = path.join(os.tmpdir(), `tts-${Date.now()}.mp3`);
 
@@ -54,7 +85,7 @@ async function handleSpeak(values: TtsFormValues): Promise<void> {
         model: TTS_MODEL,
         voice: TTS_VOICE as Parameters<typeof openai.audio.speech.create>[0]["voice"],
         response_format: TTS_RESPONSE_FORMAT,
-        input: values.ttsInput,
+        input: translatedText,
       });
     } catch (err) {
       if (err instanceof APIError) {
