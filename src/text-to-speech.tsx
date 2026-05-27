@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Detail, Form, getPreferenceValues, showToast, Toast, useNavigation } from "@raycast/api";
+import { Action, ActionPanel, Detail, Form, getPreferenceValues, Icon, showToast, Toast, useNavigation } from "@raycast/api";
 import { useState, useEffect, useRef } from "react";
 import OpenAI, { APIError } from "openai";
 import * as fs from "node:fs";
@@ -61,7 +61,7 @@ interface TranslationDetailProps {
 }
 
 function TranslationDetail({ originalText, translatedText, enableSpeech, openai }: TranslationDetailProps) {
-  const markdown = `## Translation\n\n${translatedText}\n\n---\n\n**Original:** ${originalText}`;
+  const markdown = `## 🦜 Translation\n\n${translatedText}\n\n---\n\n**Original:** ${originalText}`;
   const hasPlayedRef = useRef(false);
 
   async function handlePlaySpeech() {
@@ -115,8 +115,8 @@ function TranslationDetail({ originalText, translatedText, enableSpeech, openai 
       markdown={markdown}
       actions={
         <ActionPanel>
+          <Action title="Play Speech" icon={Icon.Speaker} onAction={handlePlaySpeech} />
           <Action.CopyToClipboard title="Copy Translation" content={translatedText} />
-          <Action title="Play Speech" onAction={handlePlaySpeech} />
         </ActionPanel>
       }
     />
