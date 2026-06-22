@@ -18,8 +18,8 @@ export function TranslationDetail({ originalText, translatedText, enableSpeech, 
       markdown={markdown}
       actions={
         <ActionPanel>
-          <Action title="Play Speech" icon={Icon.Speaker} onAction={handlePlaySpeech} />
           <Action.CopyToClipboard title="Copy Translation" content={translatedText} />
+          <Action title="Play Speech" icon={Icon.Speaker} onAction={handlePlaySpeech} />
         </ActionPanel>
       }
     />

@@ -34,6 +34,12 @@
       "title": "Text to Speech",
       "description": "Convert text to speech using OpenAI TTS",
       "mode": "view"
+    },
+    {
+      "name": "translate",
+      "title": "Quick Translator",
+      "description": "Translate text to english or spanish",
+      "mode": "view"
     }
   ],
   "dependencies": {
