@@ -23,9 +23,6 @@ export function buildGuidedTranslationMarkdown(model: GuidedTranslationModel, or
   if (model.verbTenses.trim()) {
     sections.push(`## ⏱ Verb Tenses\n${model.verbTenses}`);
   }
-  if (model.alternatives.trim()) {
-    sections.push(`## 🔁 Alternative Ways\n${model.alternatives}`);
-  }
 
   sections.push(`---\n\n**Original:** ${originalText}`);
   return sections.join("\n\n");

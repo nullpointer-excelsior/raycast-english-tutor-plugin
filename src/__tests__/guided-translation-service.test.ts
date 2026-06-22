@@ -5,7 +5,6 @@ import OpenAI from "openai";
 const ALL_ENABLED: TranslationOptions = {
   enableVocabulary: true,
   enableVerbTenses: true,
-  enableAlternatives: true,
 };
 
 function makeOpenAIClient(parsed: GuidedTranslationModel | null): OpenAI {
@@ -27,14 +26,12 @@ describe("translate", () => {
       translation: "Hola, ¿cómo estás?",
       vocabulary: "how are you -> cómo estás",
       verbTenses: "Present simple",
-      alternatives: "¿Qué tal?",
     });
     const result = await translate(client, "Hello, how are you?", ALL_ENABLED);
     expect(result).toEqual({
       translation: "Hola, ¿cómo estás?",
       vocabulary: "how are you -> cómo estás",
       verbTenses: "Present simple",
-      alternatives: "¿Qué tal?",
     });
   });
 
@@ -43,14 +40,12 @@ describe("translate", () => {
       translation: "Hola",
       vocabulary: "",
       verbTenses: "",
-      alternatives: "",
     });
     const result = await translate(client, "Hello", ALL_ENABLED);
     expect(result).toEqual({
       translation: "Hola",
       vocabulary: "",
       verbTenses: "",
-      alternatives: "",
     });
   });
 
@@ -64,7 +59,6 @@ describe("translate", () => {
       translation: "Hola",
       vocabulary: "",
       verbTenses: "",
-      alternatives: "",
     });
     await translate(client, "Hello", ALL_ENABLED);
 
@@ -85,47 +79,33 @@ describe("translate", () => {
   });
 
   it("includes the vocabulary instruction in the system prompt when enabled", async () => {
-    const client = makeOpenAIClient({ translation: "Hola", vocabulary: "", verbTenses: "", alternatives: "" });
-    await translate(client, "Hello", { enableVocabulary: true, enableVerbTenses: false, enableAlternatives: false });
+    const client = makeOpenAIClient({ translation: "Hola", vocabulary: "", verbTenses: "" });
+    await translate(client, "Hello", { enableVocabulary: true, enableVerbTenses: false });
 
     const parseMock = client.chat.completions.parse as jest.Mock;
     const systemContent = parseMock.mock.calls[0][0].messages[0].content as string;
-    expect(systemContent).toContain("vocabulary breakdown of relevant words or phrases");
+    expect(systemContent).toContain("vocabulary breakdown in markdown of complex and uncommon words or phrases");
     expect(systemContent).not.toContain("analyze and explain the verb tenses");
-    expect(systemContent).not.toContain("alternative ways to say the translated text");
   });
 
   it("includes the verb tenses instruction in the system prompt when enabled", async () => {
-    const client = makeOpenAIClient({ translation: "Hola", vocabulary: "", verbTenses: "", alternatives: "" });
-    await translate(client, "Hello", { enableVocabulary: false, enableVerbTenses: true, enableAlternatives: false });
+    const client = makeOpenAIClient({ translation: "Hola", vocabulary: "", verbTenses: "" });
+    await translate(client, "Hello", { enableVocabulary: false, enableVerbTenses: true });
 
     const parseMock = client.chat.completions.parse as jest.Mock;
     const systemContent = parseMock.mock.calls[0][0].messages[0].content as string;
     expect(systemContent).toContain("analyze and explain the verb tenses");
     expect(systemContent).not.toContain("vocabulary breakdown of relevant words or phrases");
-    expect(systemContent).not.toContain("alternative ways to say the translated text");
-  });
-
-  it("includes the alternatives instruction in the system prompt when enabled", async () => {
-    const client = makeOpenAIClient({ translation: "Hola", vocabulary: "", verbTenses: "", alternatives: "" });
-    await translate(client, "Hello", { enableVocabulary: false, enableVerbTenses: false, enableAlternatives: true });
-
-    const parseMock = client.chat.completions.parse as jest.Mock;
-    const systemContent = parseMock.mock.calls[0][0].messages[0].content as string;
-    expect(systemContent).toContain("alternative ways to say the translated text");
-    expect(systemContent).not.toContain("vocabulary breakdown of relevant words or phrases");
-    expect(systemContent).not.toContain("analyze and explain the verb tenses");
   });
 
   it("includes only the base prompt when all flags are disabled", async () => {
-    const client = makeOpenAIClient({ translation: "Hola", vocabulary: "", verbTenses: "", alternatives: "" });
-    await translate(client, "Hello", { enableVocabulary: false, enableVerbTenses: false, enableAlternatives: false });
+    const client = makeOpenAIClient({ translation: "Hola", vocabulary: "", verbTenses: "" });
+    await translate(client, "Hello", { enableVocabulary: false, enableVerbTenses: false });
 
     const parseMock = client.chat.completions.parse as jest.Mock;
     const systemContent = parseMock.mock.calls[0][0].messages[0].content as string;
     expect(systemContent).toContain("translation assistant");
     expect(systemContent).not.toContain("vocabulary breakdown of relevant words or phrases");
     expect(systemContent).not.toContain("analyze and explain the verb tenses");
-    expect(systemContent).not.toContain("alternative ways to say the translated text");
   });
 });

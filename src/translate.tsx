@@ -12,13 +12,11 @@ interface TranslateFormValues {
   ttsInput: string;
   enableVocabulary: boolean;
   enableVerbTenses: boolean;
-  enableAlternatives: boolean;
   enableSpeech: boolean;
 }
 
 export default function TranslateCommand() {
   const [enableSpeech, setEnableSpeech] = useState(false);
-  const [enableAlternativeWays, setEnableAlternativeWays] = useState(true);
   const [enableVerbTenses, setEnableVerbTenses] = useState(true);
   const [enableVocabularyBreakdown, setEnableVocabularyBreakdown] = useState(true);
   const { push } = useNavigation();
@@ -35,7 +33,6 @@ export default function TranslateCommand() {
     const options: TranslationOptions = {
       enableVocabulary: values.enableVocabulary,
       enableVerbTenses: values.enableVerbTenses,
-      enableAlternatives: values.enableAlternatives,
     };
 
     let model: GuidedTranslationModel;
@@ -83,12 +80,6 @@ export default function TranslateCommand() {
         label="Analyze Verb Tenses"
         value={enableVerbTenses}
         onChange={setEnableVerbTenses}
-      />
-      <Form.Checkbox
-        id="enableAlternatives"
-        label="Add alternative ways to say it"
-        value={enableAlternativeWays}
-        onChange={setEnableAlternativeWays}
       />
       <Form.Separator></Form.Separator>
       <Form.Checkbox id="enableSpeech" label="Enable Speech" value={enableSpeech} onChange={setEnableSpeech} />

@@ -14,9 +14,6 @@ const VOCABULARY_INSTRUCTION = `In the "vocabulary" field, provide a vocabulary 
 
 const VERB_TENSES_INSTRUCTION = `In the "verbTenses" field, analyze and explain the verb tenses used in the english input or english traslation, explain the sentences that use verb tenses, not the verbs in isolation, respond in markdown format. Leave empty if not applicable.`;
 
-const ALTERNATIVES_INSTRUCTION = `In the "alternatives" field, provide alternative ways to say the english input or english traslation in markdown format. Leave empty if not applicable.`;
-
-
 export const GUIDED_TRANSLATION_SCHEMA = {
   type: "object",
   properties: {
@@ -26,18 +23,15 @@ export const GUIDED_TRANSLATION_SCHEMA = {
     },
     vocabulary: {
       type: "string",
-      description: "Vocabulary breakdown of complex and uncommon words or phrases from english traslation or english input.",
+      description:
+        "Vocabulary breakdown of complex and uncommon words or phrases from english traslation or english input.",
     },
     verbTenses: {
       type: "string",
       description: "Analysis of verb tenses used in the source text from english traslation or english input.",
     },
-    alternatives: {
-      type: "string",
-      description: "Alternative ways to express the english translation or english input.",
-    },
   },
-  required: ["translation", "vocabulary", "verbTenses", "alternatives"],
+  required: ["translation", "vocabulary", "verbTenses"],
   additionalProperties: false,
 } as const;
 
@@ -50,14 +44,14 @@ function buildSystemPrompt(options: TranslationOptions): string {
   if (options.enableVerbTenses) {
     sections.push(VERB_TENSES_INSTRUCTION);
   }
-  if (options.enableAlternatives) {
-    sections.push(ALTERNATIVES_INSTRUCTION);
-  }
-
   return sections.join("\n\n");
 }
 
-export async function translate(client: OpenAI, text: string, options: TranslationOptions): Promise<GuidedTranslationModel> {
+export async function translate(
+  client: OpenAI,
+  text: string,
+  options: TranslationOptions,
+): Promise<GuidedTranslationModel> {
   const completion = await client.chat.completions.parse({
     model: TRANSLATION_MODEL,
     temperature: TRANSLATION_TEMPERATURE,

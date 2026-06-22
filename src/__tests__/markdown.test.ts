@@ -61,20 +61,18 @@ const FULL_GUIDED: GuidedTranslationModel = {
   translation: "Hola, ¿cómo estás?",
   vocabulary: "how are you -> cómo estás",
   verbTenses: "Present simple",
-  alternatives: "¿Qué tal?",
 };
 
 const EMPTY_SECTIONS_GUIDED: GuidedTranslationModel = {
   translation: "Hola",
   vocabulary: "",
   verbTenses: "",
-  alternatives: "",
 };
 
 describe("buildGuidedTranslationMarkdown", () => {
   it("includes the translation and original sections", () => {
     const result = buildGuidedTranslationMarkdown(FULL_GUIDED, "Hello, how are you?");
-    expect(result).toContain("## 🦜 Translation");
+    expect(result).toContain("# 🦜 Translation");
     expect(result).toContain("Hola, ¿cómo estás?");
     expect(result).toContain("**Original:** Hello, how are you?");
   });
@@ -91,27 +89,22 @@ describe("buildGuidedTranslationMarkdown", () => {
     expect(result).toContain("Present simple");
   });
 
-  it("includes the alternatives section when non-empty", () => {
-    const result = buildGuidedTranslationMarkdown(FULL_GUIDED, "Hello");
-    expect(result).toContain("## 🔁 Alternative Ways");
-    expect(result).toContain("¿Qué tal?");
-  });
-
   it("omits empty analysis sections", () => {
     const result = buildGuidedTranslationMarkdown(EMPTY_SECTIONS_GUIDED, "Hello");
     expect(result).not.toContain("## 📖 Vocabulary Breakdown");
     expect(result).not.toContain("## ⏱ Verb Tenses");
-    expect(result).not.toContain("## 🔁 Alternative Ways");
-    expect(result).toContain("## 🦜 Translation");
+    expect(result).toContain("# 🦜 Translation");
     expect(result).toContain("**Original:** Hello");
   });
 
   it("places the original marker after all analysis sections", () => {
     const result = buildGuidedTranslationMarkdown(FULL_GUIDED, "Hello");
-    const translationIdx = result.indexOf("## 🦜 Translation");
+    const translationIdx = result.indexOf("# 🦜 Translation");
     const originalIdx = result.indexOf("**Original:**");
-    const alternativesIdx = result.indexOf("## 🔁 Alternative Ways");
-    expect(translationIdx).toBeLessThan(alternativesIdx);
-    expect(alternativesIdx).toBeLessThan(originalIdx);
+    const vocabularyIdx = result.indexOf("## 📖 Vocabulary Breakdown");
+    const verbTensesIdx = result.indexOf("## ⏱ Verb Tenses");
+    expect(translationIdx).toBeLessThan(vocabularyIdx);
+    expect(vocabularyIdx).toBeLessThan(verbTensesIdx);
+    expect(verbTensesIdx).toBeLessThan(originalIdx);
   });
 });
