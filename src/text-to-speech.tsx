@@ -3,7 +3,7 @@ import { useState } from "react";
 import { APIError } from "openai";
 import { createOpenAIClient } from "./libs/openai-client";
 import { translateText } from "./libs/translation-service";
-import { TranslationDetail } from "./components/TranslationDetail";
+import { SpeechTranslationDetail } from "./components/SpeechTranslationDetail";
 
 const TTS_MAX_CHARS = 4096;
 
@@ -41,7 +41,7 @@ export default function TextToSpeechCommand() {
     toast.title = "Translation ready";
 
     push(
-      <TranslationDetail
+      <SpeechTranslationDetail
         originalText={values.ttsInput}
         translatedText={translatedText}
         enableSpeech={values.enableSpeech}
