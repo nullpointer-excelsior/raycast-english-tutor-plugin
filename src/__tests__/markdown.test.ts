@@ -1,5 +1,6 @@
-import { buildTutorMarkdown } from "../libs/markdown";
+import { buildTutorMarkdown, buildGuidedTranslationMarkdown } from "../libs/markdown";
 import { TutorResponse } from "../libs/tutor-service";
+import { GuidedTranslationModel } from "../libs/models/guided-translation.model";
 
 const FULL_RESPONSE: TutorResponse = {
   corrected_text: "Hello, how are you?",
@@ -53,5 +54,64 @@ describe("buildTutorMarkdown", () => {
     const result = buildTutorMarkdown(FULL_RESPONSE);
     const sections = result.split("\n\n");
     expect(sections.length).toBe(4);
+  });
+});
+
+const FULL_GUIDED: GuidedTranslationModel = {
+  translation: "Hola, ¿cómo estás?",
+  vocabulary: "how are you -> cómo estás",
+  verbTenses: "Present simple",
+  alternatives: "¿Qué tal?",
+};
+
+const EMPTY_SECTIONS_GUIDED: GuidedTranslationModel = {
+  translation: "Hola",
+  vocabulary: "",
+  verbTenses: "",
+  alternatives: "",
+};
+
+describe("buildGuidedTranslationMarkdown", () => {
+  it("includes the translation and original sections", () => {
+    const result = buildGuidedTranslationMarkdown(FULL_GUIDED, "Hello, how are you?");
+    expect(result).toContain("## 🦜 Translation");
+    expect(result).toContain("Hola, ¿cómo estás?");
+    expect(result).toContain("**Original:** Hello, how are you?");
+  });
+
+  it("includes the vocabulary breakdown section when non-empty", () => {
+    const result = buildGuidedTranslationMarkdown(FULL_GUIDED, "Hello");
+    expect(result).toContain("## 📖 Vocabulary Breakdown");
+    expect(result).toContain("how are you -> cómo estás");
+  });
+
+  it("includes the verb tenses section when non-empty", () => {
+    const result = buildGuidedTranslationMarkdown(FULL_GUIDED, "Hello");
+    expect(result).toContain("## ⏱ Verb Tenses");
+    expect(result).toContain("Present simple");
+  });
+
+  it("includes the alternatives section when non-empty", () => {
+    const result = buildGuidedTranslationMarkdown(FULL_GUIDED, "Hello");
+    expect(result).toContain("## 🔁 Alternative Ways");
+    expect(result).toContain("¿Qué tal?");
+  });
+
+  it("omits empty analysis sections", () => {
+    const result = buildGuidedTranslationMarkdown(EMPTY_SECTIONS_GUIDED, "Hello");
+    expect(result).not.toContain("## 📖 Vocabulary Breakdown");
+    expect(result).not.toContain("## ⏱ Verb Tenses");
+    expect(result).not.toContain("## 🔁 Alternative Ways");
+    expect(result).toContain("## 🦜 Translation");
+    expect(result).toContain("**Original:** Hello");
+  });
+
+  it("places the original marker after all analysis sections", () => {
+    const result = buildGuidedTranslationMarkdown(FULL_GUIDED, "Hello");
+    const translationIdx = result.indexOf("## 🦜 Translation");
+    const originalIdx = result.indexOf("**Original:**");
+    const alternativesIdx = result.indexOf("## 🔁 Alternative Ways");
+    expect(translationIdx).toBeLessThan(alternativesIdx);
+    expect(alternativesIdx).toBeLessThan(originalIdx);
   });
 });

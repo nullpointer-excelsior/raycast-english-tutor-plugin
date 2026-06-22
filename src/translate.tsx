@@ -2,24 +2,28 @@ import { Action, ActionPanel, Form, showToast, Toast, useNavigation } from "@ray
 import { useState } from "react";
 import { APIError } from "openai";
 import { createOpenAIClient } from "./libs/openai-client";
-import { translateText } from "./libs/translation-service";
-import { TranslationDetail } from "./components/TranslationDetail";
+import { translate } from "./libs/guided-translation-service";
+import { GuidedTranslationDetail } from "./components/GuidedTranslationDetail";
+import { GuidedTranslationModel, TranslationOptions } from "./libs/models/guided-translation.model";
 
 const TTS_MAX_CHARS = 4096;
 
-interface TtsFormValues {
+interface TranslateFormValues {
   ttsInput: string;
+  enableVocabulary: boolean;
+  enableVerbTenses: boolean;
+  enableAlternatives: boolean;
   enableSpeech: boolean;
 }
 
-export default function TextToSpeechCommand() {
+export default function TranslateCommand() {
   const [enableSpeech, setEnableSpeech] = useState(false);
   const [enableAlternativeWays, setEnableAlternativeWays] = useState(true);
   const [enableVerbTenses, setEnableVerbTenses] = useState(true);
   const [enableVocabularyBreakdown, setEnableVocabularyBreakdown] = useState(true);
   const { push } = useNavigation();
 
-  async function handleSubmit(values: TtsFormValues) {
+  async function handleSubmit(values: TranslateFormValues) {
     if (values.ttsInput.length > TTS_MAX_CHARS) {
       await showToast({ style: Toast.Style.Failure, title: "Text too long (max 4096 characters)." });
       return;
@@ -28,9 +32,15 @@ export default function TextToSpeechCommand() {
     const toast = await showToast({ style: Toast.Style.Animated, title: "Translating text..." });
     const openai = createOpenAIClient();
 
-    let translatedText: string;
+    const options: TranslationOptions = {
+      enableVocabulary: values.enableVocabulary,
+      enableVerbTenses: values.enableVerbTenses,
+      enableAlternatives: values.enableAlternatives,
+    };
+
+    let model: GuidedTranslationModel;
     try {
-      translatedText = await translateText(openai, values.ttsInput);
+      model = await translate(openai, values.ttsInput, options);
     } catch (err) {
       if (err instanceof APIError) {
         toast.style = Toast.Style.Failure;
@@ -44,9 +54,9 @@ export default function TextToSpeechCommand() {
     toast.title = "Translation ready";
 
     push(
-      <TranslationDetail
+      <GuidedTranslationDetail
         originalText={values.ttsInput}
-        translatedText={translatedText}
+        model={model}
         enableSpeech={values.enableSpeech}
         openai={openai}
       />,
@@ -62,9 +72,24 @@ export default function TextToSpeechCommand() {
       }
     >
       <Form.TextArea id="ttsInput" title="Text" placeholder="Enter text to translate..." />
-      <Form.Checkbox id="enableVocabulary" label="Vocabulary breakdown for words or phrases" value={enableVocabularyBreakdown} onChange={setEnableVocabularyBreakdown} />
-      <Form.Checkbox id="enableVerbTenses" label="Analyze Verb Tenses" value={enableVerbTenses} onChange={setEnableVerbTenses} />
-      <Form.Checkbox id="enableAlternatives" label="Add alternative ways to say it" value={enableAlternativeWays} onChange={setEnableAlternativeWays} />
+      <Form.Checkbox
+        id="enableVocabulary"
+        label="Vocabulary breakdown for words or phrases"
+        value={enableVocabularyBreakdown}
+        onChange={setEnableVocabularyBreakdown}
+      />
+      <Form.Checkbox
+        id="enableVerbTenses"
+        label="Analyze Verb Tenses"
+        value={enableVerbTenses}
+        onChange={setEnableVerbTenses}
+      />
+      <Form.Checkbox
+        id="enableAlternatives"
+        label="Add alternative ways to say it"
+        value={enableAlternativeWays}
+        onChange={setEnableAlternativeWays}
+      />
       <Form.Separator></Form.Separator>
       <Form.Checkbox id="enableSpeech" label="Enable Speech" value={enableSpeech} onChange={setEnableSpeech} />
     </Form>
