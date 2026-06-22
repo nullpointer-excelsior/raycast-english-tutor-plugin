@@ -9,7 +9,12 @@ interface TranslationDetailProps {
   openai: OpenAI;
 }
 
-export function SpeechTranslationDetail({ originalText, translatedText, enableSpeech, openai }: TranslationDetailProps) {
+export function SpeechTranslationDetail({
+  originalText,
+  translatedText,
+  enableSpeech,
+  openai,
+}: TranslationDetailProps) {
   const markdown = `## 🦜 Translation\n\n${translatedText}\n\n---\n\n**Original:** ${originalText}`;
   const { handlePlaySpeech } = useSpeech({ openai, text: translatedText, autoPlay: enableSpeech });
 

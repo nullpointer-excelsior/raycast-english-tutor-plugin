@@ -16,9 +16,7 @@ const mockShowToast = showToast as jest.Mock;
 
 const MOCK_RESPONSE = {
   corrected_text: "Hello, world!",
-  errors: [],
   corrections: [],
-  suggestions: [],
 };
 
 describe("useTutor", () => {
@@ -28,7 +26,7 @@ describe("useTutor", () => {
 
   it("starts in loading state", () => {
     mockAnalyzeTutor.mockReturnValue(new Promise(() => {}));
-    const { result } = renderHook(() => useTutor("test input"));
+    const { result } = renderHook(() => useTutor("context", "test input"));
     expect(result.current.loading).toBe(true);
     expect(result.current.response).toBeUndefined();
     expect(result.current.error).toBeUndefined();
@@ -36,7 +34,7 @@ describe("useTutor", () => {
 
   it("sets response on successful API call", async () => {
     mockAnalyzeTutor.mockResolvedValue(MOCK_RESPONSE);
-    const { result } = renderHook(() => useTutor("test input"));
+    const { result } = renderHook(() => useTutor("context", "test input"));
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -48,7 +46,7 @@ describe("useTutor", () => {
 
   it("sets error message on API failure", async () => {
     mockAnalyzeTutor.mockRejectedValue(new Error("Network error"));
-    const { result } = renderHook(() => useTutor("test input"));
+    const { result } = renderHook(() => useTutor("context", "test input"));
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -60,18 +58,16 @@ describe("useTutor", () => {
 
   it("shows a toast on API failure", async () => {
     mockAnalyzeTutor.mockRejectedValue(new Error("Something went wrong"));
-    renderHook(() => useTutor("test input"));
+    renderHook(() => useTutor("context", "test input"));
 
     await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Something went wrong" })
-      );
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Something went wrong" }));
     });
   });
 
   it("re-fetches when retry is called", async () => {
     mockAnalyzeTutor.mockResolvedValue(MOCK_RESPONSE);
-    const { result } = renderHook(() => useTutor("test input"));
+    const { result } = renderHook(() => useTutor("context", "test input"));
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -89,7 +85,7 @@ describe("useTutor", () => {
 
   it("uses 'Network error. Check your connection.' as default error message", async () => {
     mockAnalyzeTutor.mockRejectedValue({ unexpected: true });
-    const { result } = renderHook(() => useTutor("test"));
+    const { result } = renderHook(() => useTutor("context", "test"));
 
     await waitFor(() => {
       expect(result.current.error).toBe("Network error. Check your connection.");

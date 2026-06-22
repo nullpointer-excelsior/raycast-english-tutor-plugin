@@ -11,7 +11,7 @@ interface UseTutorState {
   retry: () => void;
 }
 
-export function useTutor(inputText: string): UseTutorState {
+export function useTutor(inputContext: string, inputText: string): UseTutorState {
   const [loading, setLoading] = useState(true);
   const [response, setResponse] = useState<TutorResponse | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -25,7 +25,7 @@ export function useTutor(inputText: string): UseTutorState {
 
     const client = createOpenAIClient();
 
-    analyzeTutor(client, inputText)
+    analyzeTutor(client, inputContext, inputText)
       .then((result) => {
         if (!cancelled) {
           setResponse(result);

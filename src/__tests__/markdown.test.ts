@@ -4,16 +4,23 @@ import { GuidedTranslationModel } from "../libs/models/guided-translation.model"
 
 const FULL_RESPONSE: TutorResponse = {
   corrected_text: "Hello, how are you?",
-  errors: ["Missing comma after 'Hello'", "Wrong verb tense"],
-  corrections: ["Added comma", "Changed verb tense"],
-  suggestions: ["Consider a more formal greeting"],
+  corrections: [
+    {
+      original: "Hello how are you",
+      corrected: "Hello, how are you?",
+      explanation: "Use a comma after the greeting and a question mark at the end.",
+    },
+    {
+      original: "is",
+      corrected: "are",
+      explanation: "Use the verb 'are' with the pronoun 'you'.",
+    },
+  ],
 };
 
-const EMPTY_ARRAYS_RESPONSE: TutorResponse = {
+const EMPTY_CORRECTIONS_RESPONSE: TutorResponse = {
   corrected_text: "This is correct.",
-  errors: [],
   corrections: [],
-  suggestions: [],
 };
 
 describe("buildTutorMarkdown", () => {
@@ -23,37 +30,24 @@ describe("buildTutorMarkdown", () => {
     expect(result).toContain("Hello, how are you?");
   });
 
-  it("includes the errors section with list items", () => {
+  it("includes the grammar and spelling corrections section", () => {
     const result = buildTutorMarkdown(FULL_RESPONSE);
-    expect(result).toContain("## ❌ Errors");
-    expect(result).toContain("- Missing comma after 'Hello'");
-    expect(result).toContain("- Wrong verb tense");
+    expect(result).toContain("## 📝 Grammar & Spelling Corrections");
+    expect(result).toContain("Hello how are you");
+    expect(result).toContain("Hello, how are you?");
+    expect(result).toContain("Use a comma after the greeting");
   });
 
-  it("includes the corrections section with list items", () => {
-    const result = buildTutorMarkdown(FULL_RESPONSE);
-    expect(result).toContain("## 📝 Corrections");
-    expect(result).toContain("- Added comma");
-    expect(result).toContain("- Changed verb tense");
-  });
-
-  it("includes the suggestions section with list items", () => {
-    const result = buildTutorMarkdown(FULL_RESPONSE);
-    expect(result).toContain("## 💡 Suggestions");
-    expect(result).toContain("- Consider a more formal greeting");
-  });
-
-  it("renders 'None' when arrays are empty", () => {
-    const result = buildTutorMarkdown(EMPTY_ARRAYS_RESPONSE);
-    expect(result).toContain("## ❌ Errors\nNone");
-    expect(result).toContain("## 📝 Corrections\nNone");
-    expect(result).toContain("## 💡 Suggestions\nNone");
+  it("renders a message when there are no corrections", () => {
+    const result = buildTutorMarkdown(EMPTY_CORRECTIONS_RESPONSE);
+    expect(result).toContain("## 📝 Grammar & Spelling Corrections");
+    expect(result).toContain("No corrections needed.");
   });
 
   it("sections are separated by double newlines", () => {
     const result = buildTutorMarkdown(FULL_RESPONSE);
     const sections = result.split("\n\n");
-    expect(sections.length).toBe(4);
+    expect(sections.length).toBe(2);
   });
 });
 

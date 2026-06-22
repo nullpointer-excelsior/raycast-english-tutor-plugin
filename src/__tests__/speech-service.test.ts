@@ -26,7 +26,7 @@ describe("generateSpeech", () => {
     const client = makeOpenAIClient(new ArrayBuffer(0));
     await generateSpeech(client, "Test text");
 
-    const createMock = (client.audio.speech.create as jest.Mock);
+    const createMock = client.audio.speech.create as jest.Mock;
     const callArgs = createMock.mock.calls[0][0];
     expect(callArgs.model).toBe("gpt-4o-mini-tts");
     expect(callArgs.voice).toBe("marin");

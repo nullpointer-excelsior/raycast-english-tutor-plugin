@@ -4,12 +4,13 @@ import { useTutor } from "../hooks/useTutor";
 import { buildTutorMarkdown } from "../libs/markdown";
 
 interface TutorResultDetailProps {
+  inputContext: string;
   inputText: string;
   onAnalyzeNew: () => void;
 }
 
-export function TutorResultDetail({ inputText, onAnalyzeNew }: TutorResultDetailProps) {
-  const { loading, response, error, retry } = useTutor(inputText);
+export function TutorResultDetail({ inputContext, inputText, onAnalyzeNew }: TutorResultDetailProps) {
+  const { loading, response, error, retry } = useTutor(inputContext, inputText);
 
   if (loading) {
     return <Detail isLoading={true} markdown="" />;

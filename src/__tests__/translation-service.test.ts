@@ -30,7 +30,7 @@ describe("translateText", () => {
     const client = makeOpenAIClient("Translated");
     await translateText(client, "Some input");
 
-    const createMock = (client.chat.completions.create as jest.Mock);
+    const createMock = client.chat.completions.create as jest.Mock;
     const callArgs = createMock.mock.calls[0][0];
     expect(callArgs.model).toBe("gpt-4.1-nano");
     expect(callArgs.messages[0].role).toBe("system");

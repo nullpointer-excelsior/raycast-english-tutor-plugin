@@ -1,16 +1,23 @@
-import { TutorResponse } from "./tutor-service";
+import { TutorResponse, GrammarCorrection } from "./tutor-service";
 import { GuidedTranslationModel } from "./models/guided-translation.model";
 
-function formatList(items: string[]): string {
-  return items.length > 0 ? items.map((i) => `- ${i}`).join("\n") : "None";
+function formatCorrection(correction: GrammarCorrection, index: number): string {
+  const original = correction.original || "—";
+  const corrected = correction.corrected || "—";
+  const explanation = correction.explanation || "No explanation provided.";
+  return `${index + 1}. **${original}** → **${corrected}**\n   ${explanation}`;
+}
+
+function formatCorrections(corrections: GrammarCorrection[]): string {
+  return corrections.length > 0
+    ? corrections.map((c, index) => formatCorrection(c, index)).join("\n")
+    : "No corrections needed.";
 }
 
 export function buildTutorMarkdown(response: TutorResponse): string {
   return [
     `## ✅ Corrected Text\n${response.corrected_text}`,
-    `## ❌ Errors\n${formatList(response.errors)}`,
-    `## 📝 Corrections\n${formatList(response.corrections)}`,
-    `## 💡 Suggestions\n${formatList(response.suggestions)}`,
+    `## 📝 Grammar & Spelling Corrections\n${formatCorrections(response.corrections)}`,
   ].join("\n\n");
 }
 
