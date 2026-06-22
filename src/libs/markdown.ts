@@ -15,7 +15,7 @@ export function buildTutorMarkdown(response: TutorResponse): string {
 }
 
 export function buildGuidedTranslationMarkdown(model: GuidedTranslationModel, originalText: string): string {
-  const sections: string[] = [`## 🦜 Translation\n${model.translation}`];
+  const sections: string[] = [`# 🦜 Translation\n${model.translation}`];
 
   if (model.vocabulary.trim()) {
     sections.push(`## 📖 Vocabulary Breakdown\n${model.vocabulary}`);
