@@ -1,23 +1,31 @@
 import { Action, ActionPanel, Detail, Icon } from "@raycast/api";
-import OpenAI from "openai";
+import { createOpenAIClient } from "../libs/openai-client";
+import { useGuidedTranslation } from "../hooks/useGuidedTranslation";
 import { useSpeech } from "../hooks/useSpeech";
 import { buildGuidedTranslationMarkdown } from "../libs/markdown";
 import { GuidedTranslationModel } from "../libs/models/guided-translation.model";
 
 interface GuidedTranslationDetailProps {
-  originalText: string;
-  model: GuidedTranslationModel;
+  inputText: string;
+  enableVocabulary: boolean;
+  enableVerbTenses: boolean;
   enableSpeech: boolean;
-  openai: OpenAI;
+  onTranslateNew: () => void;
 }
 
-export function GuidedTranslationDetail({ originalText, model, enableSpeech, openai }: GuidedTranslationDetailProps) {
-  const markdown = buildGuidedTranslationMarkdown(model, originalText);
+interface GuidedTranslationSuccessProps {
+  model: GuidedTranslationModel;
+  inputText: string;
+  enableSpeech: boolean;
+}
+
+function GuidedTranslationSuccess({ model, inputText, enableSpeech }: GuidedTranslationSuccessProps) {
+  const openai = createOpenAIClient();
   const { handlePlaySpeech } = useSpeech({ openai, text: model.translation, autoPlay: enableSpeech });
 
   return (
     <Detail
-      markdown={markdown}
+      markdown={buildGuidedTranslationMarkdown(model, inputText)}
       actions={
         <ActionPanel>
           <Action.CopyToClipboard title="Copy Translation" content={model.translation} />
@@ -26,4 +34,34 @@ export function GuidedTranslationDetail({ originalText, model, enableSpeech, ope
       }
     />
   );
+}
+
+export function GuidedTranslationDetail({
+  inputText,
+  enableVocabulary,
+  enableVerbTenses,
+  enableSpeech,
+  onTranslateNew,
+}: GuidedTranslationDetailProps) {
+  const { loading, model, error, retry } = useGuidedTranslation(inputText, enableVocabulary, enableVerbTenses);
+
+  if (loading) {
+    return <Detail isLoading={true} markdown="" />;
+  }
+
+  if (error) {
+    return (
+      <Detail
+        markdown={`## ⚠️ Error\n\n${error}`}
+        actions={
+          <ActionPanel>
+            <Action title="Retry" shortcut={{ modifiers: ["cmd"], key: "r" }} onAction={retry} />
+            <Action title="Translate New Text" onAction={onTranslateNew} />
+          </ActionPanel>
+        }
+      />
+    );
+  }
+
+  return <GuidedTranslationSuccess model={model!} inputText={inputText} enableSpeech={enableSpeech} />;
 }

@@ -1,10 +1,6 @@
 import { Action, ActionPanel, Form, showToast, Toast, useNavigation } from "@raycast/api";
 import { useState } from "react";
-import { APIError } from "openai";
-import { createOpenAIClient } from "./libs/openai-client";
-import { translate } from "./libs/guided-translation-service";
 import { GuidedTranslationDetail } from "./components/GuidedTranslationDetail";
-import { GuidedTranslationModel, TranslationOptions } from "./libs/models/guided-translation.model";
 
 const TTS_MAX_CHARS = 4096;
 
@@ -19,7 +15,12 @@ export default function TranslateCommand() {
   const [enableSpeech, setEnableSpeech] = useState(false);
   const [enableVerbTenses, setEnableVerbTenses] = useState(true);
   const [enableVocabularyBreakdown, setEnableVocabularyBreakdown] = useState(true);
+  const [inputKey, setInputKey] = useState(0);
   const { push } = useNavigation();
+
+  function handleTranslateNew() {
+    setInputKey((key) => key + 1);
+  }
 
   async function handleSubmit(values: TranslateFormValues) {
     if (values.ttsInput.length > TTS_MAX_CHARS) {
@@ -27,41 +28,20 @@ export default function TranslateCommand() {
       return;
     }
 
-    const toast = await showToast({ style: Toast.Style.Animated, title: "Translating text..." });
-    const openai = createOpenAIClient();
-
-    const options: TranslationOptions = {
-      enableVocabulary: values.enableVocabulary,
-      enableVerbTenses: values.enableVerbTenses,
-    };
-
-    let model: GuidedTranslationModel;
-    try {
-      model = await translate(openai, values.ttsInput, options);
-    } catch (err) {
-      if (err instanceof APIError) {
-        toast.style = Toast.Style.Failure;
-        toast.title = err.status === 401 ? "Invalid OpenAI API Key. Check your preferences." : err.message;
-        return;
-      }
-      throw err;
-    }
-
-    toast.style = Toast.Style.Success;
-    toast.title = "Translation ready";
-
     push(
       <GuidedTranslationDetail
-        originalText={values.ttsInput}
-        model={model}
+        inputText={values.ttsInput}
+        enableVocabulary={values.enableVocabulary}
+        enableVerbTenses={values.enableVerbTenses}
         enableSpeech={values.enableSpeech}
-        openai={openai}
+        onTranslateNew={handleTranslateNew}
       />,
     );
   }
 
   return (
     <Form
+      key={inputKey}
       actions={
         <ActionPanel>
           <Action.SubmitForm title="Translate" onSubmit={handleSubmit} />
