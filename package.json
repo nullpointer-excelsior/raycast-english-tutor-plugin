@@ -40,6 +40,12 @@
       "title": "Quick Translator",
       "description": "Translate text to english or spanish",
       "mode": "view"
+    },
+    {
+      "name": "grammar-and-translate",
+      "title": "Grammar & Translate",
+      "description": "Correct Spanish grammar/spelling and translate to English",
+      "mode": "view"
     }
   ],
   "dependencies": {

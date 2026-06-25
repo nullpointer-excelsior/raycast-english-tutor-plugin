@@ -1,5 +1,6 @@
 import { TutorResponse, GrammarCorrection } from "./tutor-service";
 import { GuidedTranslationModel } from "./models/guided-translation.model";
+import { GrammarTranslateResponse } from "./models/grammar-translate.model";
 
 function formatCorrection(correction: GrammarCorrection, index: number): string {
   const original = correction.original || "—";
@@ -34,4 +35,20 @@ export function buildGuidedTranslationMarkdown(model: GuidedTranslationModel, or
 
   sections.push(`---\n\n**Original:** ${originalText}`);
   return sections.join("\n\n");
+}
+
+export function buildGrammarTranslateMarkdown(response: GrammarTranslateResponse): string {
+  const correctionsList =
+    response.corrections.length > 0
+      ? response.corrections
+          .map((c, i) => `${i + 1}. **${c.original}** → **${c.corrected}**\n   ${c.explanation}`)
+          .join("\n")
+      : "No corrections needed.";
+
+  return [
+    `## 🇪🇸 Original\n${response.original_text}`,
+    `## ✅ Corrected Spanish\n${response.corrected_spanish}`,
+    `## 📝 Corrections\n${correctionsList}`,
+    `## 🇬🇧 English Translation\n${response.english_translation}`,
+  ].join("\n\n");
 }
