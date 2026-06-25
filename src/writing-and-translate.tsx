@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Form, showToast, Toast, useNavigation } from "@raycast/api";
 import { useState } from "react";
-import { GrammarTranslateDetail } from "./components/GrammarTranslateDetail";
+import { WritingTranslateDetail } from "./components/WritingTranslateDetail";
 
 interface WritingTranslateFormValues {
   inputText: string;
@@ -20,7 +20,7 @@ function WritingTranslateForm() {
       return;
     }
 
-    push(<GrammarTranslateDetail inputText={values.inputText} onNew={handleNew} />);
+    push(<WritingTranslateDetail inputText={values.inputText} onNew={handleNew} />);
   }
 
   return (

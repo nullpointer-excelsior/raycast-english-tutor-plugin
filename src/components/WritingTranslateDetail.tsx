@@ -1,14 +1,14 @@
 import { Action, ActionPanel, Detail, showHUD } from "@raycast/api";
-import { useGrammarTranslate } from "../hooks/useGrammarTranslate";
-import { buildGrammarTranslateMarkdown } from "../libs/markdown";
+import { useWritingTranslate } from "../hooks/useWritingTranslate";
+import { buildWritingTranslateMarkdown } from "../libs/markdown";
 
-interface GrammarTranslateDetailProps {
+interface WritingTranslateDetailProps {
   inputText: string;
   onNew: () => void;
 }
 
-export function GrammarTranslateDetail({ inputText, onNew }: GrammarTranslateDetailProps) {
-  const { loading, response, error, retry } = useGrammarTranslate(inputText);
+export function WritingTranslateDetail({ inputText, onNew }: WritingTranslateDetailProps) {
+  const { loading, response, error, retry } = useWritingTranslate(inputText);
 
   if (loading) {
     return <Detail isLoading={true} markdown="" />;
@@ -30,7 +30,7 @@ export function GrammarTranslateDetail({ inputText, onNew }: GrammarTranslateDet
 
   return (
     <Detail
-      markdown={buildGrammarTranslateMarkdown(response!)}
+      markdown={buildWritingTranslateMarkdown(response!)}
       actions={
         <ActionPanel>
           <Action.CopyToClipboard

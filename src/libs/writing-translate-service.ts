@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { GrammarTranslateResponse } from "./models/grammar-translate.model";
+import { WritingTranslateResponse } from "./models/writing-translate.model";
 
 const MODEL = "gpt-4.1-mini";
 const TEMPERATURE = 0;
@@ -23,7 +23,7 @@ Respond ONLY with valid JSON matching this schema:
   ]
 }`;
 
-export async function grammarAndTranslate(client: OpenAI, inputText: string): Promise<GrammarTranslateResponse> {
+export async function writingAndTranslate(client: OpenAI, inputText: string): Promise<WritingTranslateResponse> {
   const completion = await client.chat.completions.create({
     model: MODEL,
     temperature: TEMPERATURE,
@@ -35,9 +35,9 @@ export async function grammarAndTranslate(client: OpenAI, inputText: string): Pr
   });
 
   const content = completion.choices[0].message.content ?? "";
-  let parsed: GrammarTranslateResponse;
+  let parsed: WritingTranslateResponse;
   try {
-    parsed = JSON.parse(content) as GrammarTranslateResponse;
+    parsed = JSON.parse(content) as WritingTranslateResponse;
   } catch {
     throw new Error("Unexpected AI response format");
   }

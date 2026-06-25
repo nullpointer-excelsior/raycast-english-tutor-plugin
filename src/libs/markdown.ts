@@ -1,6 +1,6 @@
 import { TutorResponse, GrammarCorrection } from "./tutor-service";
 import { GuidedTranslationModel } from "./models/guided-translation.model";
-import { GrammarTranslateResponse } from "./models/grammar-translate.model";
+import { WritingTranslateResponse } from "./models/writing-translate.model";
 
 function formatCorrection(correction: GrammarCorrection, index: number): string {
   const original = correction.original || "—";
@@ -37,7 +37,7 @@ export function buildGuidedTranslationMarkdown(model: GuidedTranslationModel, or
   return sections.join("\n\n");
 }
 
-export function buildGrammarTranslateMarkdown(response: GrammarTranslateResponse): string {
+export function buildWritingTranslateMarkdown(response: WritingTranslateResponse): string {
   const correctionsList =
     response.corrections.length > 0
       ? response.corrections

@@ -4,7 +4,7 @@ export interface WritingCorrection {
   explanation: string;
 }
 
-export interface GrammarTranslateResponse {
+export interface WritingTranslateResponse {
   original_text: string;
   english_translation: string;
   improved_writing: string;

@@ -24,14 +24,20 @@ const EMPTY_CORRECTIONS_RESPONSE: TutorResponse = {
 };
 
 describe("buildTutorMarkdown", () => {
+  it("includes the original text section", () => {
+    const result = buildTutorMarkdown(FULL_RESPONSE, "Hello how are you");
+    expect(result).toContain("## ✏️ Original");
+    expect(result).toContain("Hello how are you");
+  });
+
   it("includes the corrected text section", () => {
-    const result = buildTutorMarkdown(FULL_RESPONSE);
+    const result = buildTutorMarkdown(FULL_RESPONSE, "Hello how are you");
     expect(result).toContain("## ✅ Corrected Text");
     expect(result).toContain("Hello, how are you?");
   });
 
   it("includes the grammar and spelling corrections section", () => {
-    const result = buildTutorMarkdown(FULL_RESPONSE);
+    const result = buildTutorMarkdown(FULL_RESPONSE, "Hello how are you");
     expect(result).toContain("## 📝 Grammar & Spelling Corrections");
     expect(result).toContain("Hello how are you");
     expect(result).toContain("Hello, how are you?");
@@ -39,15 +45,15 @@ describe("buildTutorMarkdown", () => {
   });
 
   it("renders a message when there are no corrections", () => {
-    const result = buildTutorMarkdown(EMPTY_CORRECTIONS_RESPONSE);
+    const result = buildTutorMarkdown(EMPTY_CORRECTIONS_RESPONSE, "This is correct.");
     expect(result).toContain("## 📝 Grammar & Spelling Corrections");
     expect(result).toContain("No corrections needed.");
   });
 
   it("sections are separated by double newlines", () => {
-    const result = buildTutorMarkdown(FULL_RESPONSE);
+    const result = buildTutorMarkdown(FULL_RESPONSE, "Hello how are you");
     const sections = result.split("\n\n");
-    expect(sections.length).toBe(2);
+    expect(sections.length).toBe(3);
   });
 });
 
