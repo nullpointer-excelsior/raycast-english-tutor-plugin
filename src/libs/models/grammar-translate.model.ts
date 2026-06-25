@@ -1,4 +1,4 @@
-export interface GrammarCorrection {
+export interface WritingCorrection {
   original: string;
   corrected: string;
   explanation: string;
@@ -6,7 +6,7 @@ export interface GrammarCorrection {
 
 export interface GrammarTranslateResponse {
   original_text: string;
-  corrected_spanish: string;
-  corrections: GrammarCorrection[];
   english_translation: string;
+  improved_writing: string;
+  corrections: WritingCorrection[];
 }

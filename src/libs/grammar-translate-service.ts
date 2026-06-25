@@ -4,18 +4,23 @@ import { GrammarTranslateResponse } from "./models/grammar-translate.model";
 const MODEL = "gpt-4.1-mini";
 const TEMPERATURE = 0;
 
-const SYSTEM_PROMPT = `You are an expert Spanish-to-English translator.
+const SYSTEM_PROMPT = `You are an expert Spanish-to-English translator and English writing editor.
 
-The user will provide text in Spanish. Translate it into natural, idiomatic English.
+Perform the following steps in order:
+1. Translate the user's Spanish text into natural, idiomatic English. This is the direct translation.
+2. Improve the writing of that English translation for clarity, flow, grammar, and style, while preserving the original meaning, tone, and nuance. Identify every change you made to transform the translation into the improved version.
 
 Important:
-- Preserve the original meaning, tone, and nuance.
-- The English translation must sound natural and idiomatic.
-- Translate directly; do not add commentary, explanations, or corrections.
+- The improved writing must remain faithful to the original meaning and tone.
+- Each correction should describe a single, specific change between the direct translation and the improved writing.
 
 Respond ONLY with valid JSON matching this schema:
 {
-  "english_translation": "string"
+  "english_translation": "string (the direct Spanish-to-English translation)",
+  "improved_writing": "string (the improved English text)",
+  "corrections": [
+    { "original": "string (phrase from the translation)", "corrected": "string (the improved phrase)", "explanation": "string" }
+  ]
 }`;
 
 export async function grammarAndTranslate(client: OpenAI, inputText: string): Promise<GrammarTranslateResponse> {
@@ -39,8 +44,8 @@ export async function grammarAndTranslate(client: OpenAI, inputText: string): Pr
 
   return {
     original_text: inputText,
-    corrected_spanish: inputText,
-    corrections: [],
     english_translation: parsed.english_translation ?? "",
+    improved_writing: parsed.improved_writing ?? "",
+    corrections: Array.isArray(parsed.corrections) ? parsed.corrections : [],
   };
 }

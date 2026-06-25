@@ -47,8 +47,8 @@ export function buildGrammarTranslateMarkdown(response: GrammarTranslateResponse
 
   return [
     `## 🇪🇸 Original\n${response.original_text}`,
-    `## ✅ Corrected Spanish\n${response.corrected_spanish}`,
-    `## 📝 Corrections\n${correctionsList}`,
-    `## 🇬🇧 English Translation\n${response.english_translation}`,
+    `## 🇬🇧 Translation\n${response.english_translation}`,
+    `## ✅ Improved Writing\n${response.improved_writing}`,
+    `## 📝 Writing Corrections\n${correctionsList}`,
   ].join("\n\n");
 }

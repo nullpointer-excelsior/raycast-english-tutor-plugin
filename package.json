@@ -42,9 +42,9 @@
       "mode": "view"
     },
     {
-      "name": "grammar-and-translate",
-      "title": "Grammar & Translate",
-      "description": "Correct Spanish grammar/spelling and translate to English",
+      "name": "writing-and-translate",
+      "title": "Writing & Translate",
+      "description": "Translate Spanish text to English and improve its writing",
       "mode": "view"
     }
   ],

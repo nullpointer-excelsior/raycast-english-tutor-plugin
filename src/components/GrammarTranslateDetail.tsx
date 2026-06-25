@@ -1,5 +1,6 @@
 import { Action, ActionPanel, Detail, showHUD } from "@raycast/api";
 import { useGrammarTranslate } from "../hooks/useGrammarTranslate";
+import { buildGrammarTranslateMarkdown } from "../libs/markdown";
 
 interface GrammarTranslateDetailProps {
   inputText: string;
@@ -29,9 +30,14 @@ export function GrammarTranslateDetail({ inputText, onNew }: GrammarTranslateDet
 
   return (
     <Detail
-      markdown={response!.english_translation}
+      markdown={buildGrammarTranslateMarkdown(response!)}
       actions={
         <ActionPanel>
+          <Action.CopyToClipboard
+            title="Copy Improved Writing"
+            content={response!.improved_writing}
+            onCopy={() => showHUD("Improved Writing Copied!")}
+          />
           <Action.CopyToClipboard
             title="Copy Translation"
             content={response!.english_translation}
