@@ -39,7 +39,7 @@ function EnglishTutorForm() {
         </ActionPanel>
       }
     >
-      <Form.TextField
+      <Form.TextArea
         id="inputContext"
         title="What do you want to say?"
         placeholder="Type the idea you want to say in English"
