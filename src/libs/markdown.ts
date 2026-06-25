@@ -14,8 +14,9 @@ function formatCorrections(corrections: GrammarCorrection[]): string {
     : "No corrections needed.";
 }
 
-export function buildTutorMarkdown(response: TutorResponse): string {
+export function buildTutorMarkdown(response: TutorResponse, originalText: string): string {
   return [
+    `## ✏️ Original\n${originalText}`,
     `## ✅ Corrected Text\n${response.corrected_text}`,
     `## 📝 Grammar & Spelling Corrections\n${formatCorrections(response.corrections)}`,
   ].join("\n\n");

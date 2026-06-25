@@ -32,7 +32,7 @@ export function TutorResultDetail({ inputContext, inputText, onAnalyzeNew }: Tut
 
   return (
     <Detail
-      markdown={buildTutorMarkdown(response!)}
+      markdown={buildTutorMarkdown(response!, inputText)}
       actions={
         <ActionPanel>
           <Action.CopyToClipboard
