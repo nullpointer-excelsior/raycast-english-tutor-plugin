@@ -1,4 +1,4 @@
-import { buildTutorMarkdown, buildGuidedTranslationMarkdown } from "../libs/markdown";
+import { buildTutorMarkdown, buildGuidedTranslationMarkdown, buildCorrectionsSpeechText } from "../libs/markdown";
 import { TutorResponse } from "../libs/tutor-service";
 import { GuidedTranslationModel } from "../libs/models/guided-translation.model";
 
@@ -54,6 +54,28 @@ describe("buildTutorMarkdown", () => {
     const result = buildTutorMarkdown(FULL_RESPONSE, "Hello how are you");
     const sections = result.split("\n\n");
     expect(sections.length).toBe(3);
+  });
+});
+
+describe("buildCorrectionsSpeechText", () => {
+  it("composes natural spoken text for each correction", () => {
+    const result = buildCorrectionsSpeechText(FULL_RESPONSE.corrections);
+    expect(result).toContain("Grammar and spelling corrections.");
+    expect(result).toContain("Correction 1. 'Hello how are you' should be 'Hello, how are you?'.");
+    expect(result).toContain("Use a comma after the greeting and a question mark at the end.");
+    expect(result).toContain("Correction 2. 'is' should be 'are'.");
+    expect(result).toContain("Use the verb 'are' with the pronoun 'you'.");
+  });
+
+  it("handles an empty corrections array gracefully", () => {
+    const result = buildCorrectionsSpeechText(EMPTY_CORRECTIONS_RESPONSE.corrections);
+    expect(result).toBe("No corrections needed.");
+  });
+
+  it("uses fallback text when correction fields are missing", () => {
+    const result = buildCorrectionsSpeechText([{ original: "", corrected: "", explanation: "" }]);
+    expect(result).toContain("Correction 1. 'unknown' should be 'unknown'.");
+    expect(result).toContain("No explanation provided.");
   });
 });
 

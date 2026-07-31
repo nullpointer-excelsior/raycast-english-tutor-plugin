@@ -1,7 +1,9 @@
-import { Action, ActionPanel, Detail } from "@raycast/api";
+import { Action, ActionPanel, Detail, Icon } from "@raycast/api";
 import { showHUD } from "@raycast/api";
 import { useTutor } from "../hooks/useTutor";
-import { buildTutorMarkdown } from "../libs/markdown";
+import { useSpeech } from "../hooks/useSpeech";
+import { buildTutorMarkdown, buildCorrectionsSpeechText } from "../libs/markdown";
+import { createOpenAIClient } from "../libs/openai-client";
 
 interface TutorResultDetailProps {
   inputContext: string;
@@ -11,6 +13,18 @@ interface TutorResultDetailProps {
 
 export function TutorResultDetail({ inputContext, inputText, onAnalyzeNew }: TutorResultDetailProps) {
   const { loading, response, error, retry } = useTutor(inputContext, inputText);
+  const openai = createOpenAIClient();
+  const { handlePlaySpeech: handlePlayCorrectedTextSpeech } = useSpeech({
+    openai,
+    text: response?.corrected_text ?? "",
+    autoPlay: false,
+  });
+  const correctionsSpeechText = buildCorrectionsSpeechText(response?.corrections ?? []);
+  const { handlePlaySpeech: handlePlayCorrectionsSpeech } = useSpeech({
+    openai,
+    text: correctionsSpeechText,
+    autoPlay: false,
+  });
 
   if (loading) {
     return <Detail isLoading={true} markdown="" />;
@@ -39,6 +53,18 @@ export function TutorResultDetail({ inputContext, inputText, onAnalyzeNew }: Tut
             title="Copy Corrected Text"
             content={response!.corrected_text}
             onCopy={() => showHUD("Corrected Text Copied!")}
+          />
+          <Action
+            title="Play Speech"
+            icon={Icon.Speaker}
+            shortcut={{ modifiers: ["cmd"], key: "s" }}
+            onAction={handlePlayCorrectedTextSpeech}
+          />
+          <Action
+            title="Play Corrections Speech"
+            icon={Icon.Speaker}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "s" }}
+            onAction={handlePlayCorrectionsSpeech}
           />
           <Action title="Analyze New Text" shortcut={{ modifiers: ["cmd"], key: "n" }} onAction={onAnalyzeNew} />
         </ActionPanel>

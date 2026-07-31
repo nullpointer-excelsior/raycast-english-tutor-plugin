@@ -15,6 +15,21 @@ function formatCorrections(corrections: GrammarCorrection[]): string {
     : "No corrections needed.";
 }
 
+export function buildCorrectionsSpeechText(corrections: GrammarCorrection[]): string {
+  if (corrections.length === 0) {
+    return "No corrections needed.";
+  }
+
+  const spokenCorrections = corrections.map((correction, index) => {
+    const original = correction.original || "unknown";
+    const corrected = correction.corrected || "unknown";
+    const explanation = correction.explanation || "No explanation provided.";
+    return `Correction ${index + 1}. '${original}' should be '${corrected}'. ${explanation}`;
+  });
+
+  return `Grammar and spelling corrections. ${spokenCorrections.join(" ")}`;
+}
+
 export function buildTutorMarkdown(response: TutorResponse, originalText: string): string {
   return [
     `## ✏️ Original\n${originalText}`,

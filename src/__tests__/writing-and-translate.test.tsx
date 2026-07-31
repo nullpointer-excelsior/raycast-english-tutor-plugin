@@ -34,9 +34,7 @@ describe("WritingTranslateCommand", () => {
 
     await onSubmit({ inputText: "" });
 
-    expect(showToast).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "Please enter some Spanish text." }),
-    );
+    expect(showToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Please enter some Spanish text." }));
     expect(mockPush).not.toHaveBeenCalled();
   });
 
@@ -46,9 +44,7 @@ describe("WritingTranslateCommand", () => {
 
     await onSubmit({ inputText: "   \n\t  " });
 
-    expect(showToast).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "Please enter some Spanish text." }),
-    );
+    expect(showToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Please enter some Spanish text." }));
     expect(mockPush).not.toHaveBeenCalled();
   });
 
