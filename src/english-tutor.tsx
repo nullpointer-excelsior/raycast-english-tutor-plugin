@@ -26,7 +26,7 @@ function EnglishTutorForm() {
     if (phrase) {
       setInputContext(phrase);
       toast.style = Toast.Style.Success;
-      toast.title = "Random phrase generated";
+      toast.title = "Spanish phrase added — now translate it to English below";
     } else {
       toast.style = Toast.Style.Failure;
       toast.title = "Failed to generate phrase";
@@ -76,15 +76,18 @@ function EnglishTutorForm() {
       </Form.Dropdown>
       <Form.TextArea
         id="inputContext"
-        title="What do you want to say?"
-        placeholder="Type the idea you want to say in Spanish or generate a random phrase to translate into English"
+        title="Context / Intention (optional)"
+        placeholder="What you want to say — in Spanish. Use ⌘G to generate a random phrase to translate into English."
+        info="Optional. Helps the tutor understand your intention. Generate a random Spanish phrase to practice translating it."
         value={inputContext}
         onChange={setInputContext}
       />
+      <Form.Separator />
       <Form.TextArea
         id="inputText"
-        title="Text to evaluate"
-        placeholder="Type or paste your English text here... Use <word> for words you don't know in English."
+        title="Your English text to evaluate"
+        placeholder="Write your English translation here. Use <word> for words you don't know in English."
+        autoFocus
       />
     </Form>
   );
