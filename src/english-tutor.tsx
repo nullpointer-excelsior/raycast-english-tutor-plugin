@@ -1,6 +1,8 @@
-import { Action, ActionPanel, Form, showToast, Toast, useNavigation } from "@raycast/api";
+import { Action, ActionPanel, Form, Icon, showToast, Toast, useNavigation } from "@raycast/api";
 import { useState } from "react";
 import { TutorResultDetail } from "./components/TutorResultDetail";
+import { useRandomPhrase } from "./hooks/useRandomPhrase";
+import { DEFAULT_PROFICIENCY_LEVEL, PROFICIENCY_LEVELS, ProficiencyLevel } from "./libs/models/proficiency-level.model";
 
 interface TutorFormValues {
   inputContext: string;
@@ -10,9 +12,25 @@ interface TutorFormValues {
 function EnglishTutorForm() {
   const { push } = useNavigation();
   const [inputKey, setInputKey] = useState(0);
+  const [inputContext, setInputContext] = useState("");
+  const [complexity, setComplexity] = useState<ProficiencyLevel>(DEFAULT_PROFICIENCY_LEVEL);
+  const { generate, loading } = useRandomPhrase();
 
   function handleAnalyzeNew() {
     setInputKey((k) => k + 1);
+  }
+
+  async function handleGenerateRandomPhrase() {
+    const toast = await showToast({ style: Toast.Style.Animated, title: "Generating random phrase..." });
+    const phrase = await generate(complexity);
+    if (phrase) {
+      setInputContext(phrase);
+      toast.style = Toast.Style.Success;
+      toast.title = "Random phrase generated";
+    } else {
+      toast.style = Toast.Style.Failure;
+      toast.title = "Failed to generate phrase";
+    }
   }
 
   async function handleSubmit(values: TutorFormValues) {
@@ -33,16 +51,35 @@ function EnglishTutorForm() {
   return (
     <Form
       key={inputKey}
+      isLoading={loading}
       actions={
         <ActionPanel>
           <Action.SubmitForm title="Analyze" onSubmit={handleSubmit} />
+          <Action
+            title="Generate Random Phrase"
+            icon={Icon.Wand}
+            onAction={handleGenerateRandomPhrase}
+            shortcut={{ modifiers: ["cmd"], key: "g" }}
+          />
         </ActionPanel>
       }
     >
+      <Form.Dropdown
+        id="complexity"
+        title="Phrase Level"
+        value={complexity}
+        onChange={(v) => setComplexity(v as ProficiencyLevel)}
+      >
+        {PROFICIENCY_LEVELS.map((level) => (
+          <Form.Dropdown.Item key={level} value={level} title={level} />
+        ))}
+      </Form.Dropdown>
       <Form.TextArea
         id="inputContext"
         title="What do you want to say?"
-        placeholder="Type the idea you want to say in English"
+        placeholder="Type the idea you want to say in Spanish or generate a random phrase to translate into English"
+        value={inputContext}
+        onChange={setInputContext}
       />
       <Form.TextArea
         id="inputText"

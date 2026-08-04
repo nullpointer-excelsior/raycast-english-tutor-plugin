@@ -56,6 +56,23 @@ const FormCheckbox = jest.fn(({ id, label }: { id?: string; label?: string }) =>
 
 const FormSeparator = jest.fn(() => React.createElement("hr", { "data-testid": "form-separator" }));
 
+const FormDropdownItem = jest.fn(({ value, title }: { value?: string; title?: string }) =>
+  React.createElement("option", { "data-testid": `form-dropdown-item-${value}`, value }, title),
+);
+
+const FormDropdown = jest.fn(
+  ({ id, title, value, onChange }: { id?: string; title?: string; value?: string; onChange?: (v: string) => void }) =>
+    React.createElement(
+      "select",
+      {
+        "data-testid": `form-dropdown-${id}`,
+        value,
+        onChange: (e: { target: { value: string } }) => onChange?.(e.target.value),
+      },
+      title,
+    ),
+);
+
 export const Form = Object.assign(
   jest.fn(({ children, actions }: { children?: React.ReactNode; actions?: React.ReactNode }) =>
     React.createElement("form", { "data-testid": "form" }, actions, children),
@@ -64,6 +81,7 @@ export const Form = Object.assign(
     TextArea: FormTextArea,
     Checkbox: FormCheckbox,
     Separator: FormSeparator,
+    Dropdown: Object.assign(FormDropdown, { Item: FormDropdownItem }),
   },
 );
 
