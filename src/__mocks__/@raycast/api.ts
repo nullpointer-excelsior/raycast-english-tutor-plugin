@@ -37,8 +37,15 @@ export const Action = Object.assign(ActionBase, {
   Push: ActionPush,
 });
 
-export const ActionPanel = jest.fn(({ children }: { children?: React.ReactNode }) =>
-  React.createElement("div", { "data-testid": "action-panel" }, children),
+const ActionPanelSubmenu = jest.fn(({ title, children }: { title?: string; children?: React.ReactNode }) =>
+  React.createElement("div", { "data-testid": "action-panel-submenu", "data-title": title }, children),
+);
+
+export const ActionPanel = Object.assign(
+  jest.fn(({ children }: { children?: React.ReactNode }) =>
+    React.createElement("div", { "data-testid": "action-panel" }, children),
+  ),
+  { Submenu: ActionPanelSubmenu },
 );
 
 export const Detail = jest.fn(
