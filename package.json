@@ -35,13 +35,7 @@
       "description": "Convert the input text to speech using OpenAI TTS",
       "mode": "view"
     },
-    {
-      "name": "english-speech",
-      "title": "Speech In English",
-      "description": "Convert text to speech using OpenAI TTS",
-      "mode": "view"
-    },
-    {
+{
       "name": "translate",
       "title": "Quick Translator",
       "description": "Translate text to english or spanish",
