@@ -30,6 +30,12 @@
       "mode": "view"
     },
     {
+      "name": "speech",
+      "title": "Speech",
+      "description": "Convert the input text to speech using OpenAI TTS",
+      "mode": "view"
+    },
+    {
       "name": "text-to-speech",
       "title": "Text to Speech",
       "description": "Convert text to speech using OpenAI TTS",
