@@ -21,7 +21,8 @@ interface GuidedTranslationSuccessProps {
 
 function GuidedTranslationSuccess({ model, inputText, enableSpeech }: GuidedTranslationSuccessProps) {
   const openai = createOpenAIClient();
-  const { handlePlaySpeech } = useSpeech({ openai, text: model.translation, autoPlay: enableSpeech });
+  const speechText = model.sourceLanguage === "english" ? inputText : model.translation;
+  const { handlePlaySpeech } = useSpeech({ openai, text: speechText, autoPlay: enableSpeech });
 
   return (
     <Detail
@@ -29,7 +30,7 @@ function GuidedTranslationSuccess({ model, inputText, enableSpeech }: GuidedTran
       actions={
         <ActionPanel>
           <Action.CopyToClipboard title="Copy Translation" content={model.translation} />
-          <Action title="Play Speech" icon={Icon.Speaker} onAction={handlePlaySpeech} />
+          <Action title="Play English Speech" icon={Icon.Speaker} onAction={handlePlaySpeech} />
         </ActionPanel>
       }
     />

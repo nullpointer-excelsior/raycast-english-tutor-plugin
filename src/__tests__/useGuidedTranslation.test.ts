@@ -18,6 +18,7 @@ const mockTranslate = translate as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
 
 const MOCK_MODEL = {
+  sourceLanguage: "english",
   translation: "Hola, mundo",
   vocabulary: "",
   verbTenses: "",

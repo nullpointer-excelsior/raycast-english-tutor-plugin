@@ -23,12 +23,14 @@ function makeOpenAIClient(parsed: GuidedTranslationModel | null): OpenAI {
 describe("translate", () => {
   it("returns a parsed GuidedTranslationModel on a valid response", async () => {
     const client = makeOpenAIClient({
+      sourceLanguage: "english",
       translation: "Hola, ¿cómo estás?",
       vocabulary: "how are you -> cómo estás",
       verbTenses: "Present simple",
     });
     const result = await translate(client, "Hello, how are you?", ALL_ENABLED);
     expect(result).toEqual({
+      sourceLanguage: "english",
       translation: "Hola, ¿cómo estás?",
       vocabulary: "how are you -> cómo estás",
       verbTenses: "Present simple",
@@ -37,12 +39,14 @@ describe("translate", () => {
 
   it("returns empty strings for fields disabled by the system prompt", async () => {
     const client = makeOpenAIClient({
+      sourceLanguage: "english",
       translation: "Hola",
       vocabulary: "",
       verbTenses: "",
     });
     const result = await translate(client, "Hello", ALL_ENABLED);
     expect(result).toEqual({
+      sourceLanguage: "english",
       translation: "Hola",
       vocabulary: "",
       verbTenses: "",
@@ -56,6 +60,7 @@ describe("translate", () => {
 
   it("calls the API with the structured output schema, model and temperature", async () => {
     const client = makeOpenAIClient({
+      sourceLanguage: "english",
       translation: "Hola",
       vocabulary: "",
       verbTenses: "",
@@ -79,7 +84,7 @@ describe("translate", () => {
   });
 
   it("includes the vocabulary instruction in the system prompt when enabled", async () => {
-    const client = makeOpenAIClient({ translation: "Hola", vocabulary: "", verbTenses: "" });
+    const client = makeOpenAIClient({ sourceLanguage: "english", translation: "Hola", vocabulary: "", verbTenses: "" });
     await translate(client, "Hello", { enableVocabulary: true, enableVerbTenses: false });
 
     const parseMock = client.chat.completions.parse as jest.Mock;
@@ -89,7 +94,7 @@ describe("translate", () => {
   });
 
   it("includes the verb tenses instruction in the system prompt when enabled", async () => {
-    const client = makeOpenAIClient({ translation: "Hola", vocabulary: "", verbTenses: "" });
+    const client = makeOpenAIClient({ sourceLanguage: "english", translation: "Hola", vocabulary: "", verbTenses: "" });
     await translate(client, "Hello", { enableVocabulary: false, enableVerbTenses: true });
 
     const parseMock = client.chat.completions.parse as jest.Mock;
@@ -99,7 +104,7 @@ describe("translate", () => {
   });
 
   it("includes only the base prompt when all flags are disabled", async () => {
-    const client = makeOpenAIClient({ translation: "Hola", vocabulary: "", verbTenses: "" });
+    const client = makeOpenAIClient({ sourceLanguage: "english", translation: "Hola", vocabulary: "", verbTenses: "" });
     await translate(client, "Hello", { enableVocabulary: false, enableVerbTenses: false });
 
     const parseMock = client.chat.completions.parse as jest.Mock;

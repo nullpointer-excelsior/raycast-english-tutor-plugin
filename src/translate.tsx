@@ -62,7 +62,7 @@ export default function TranslateCommand() {
         onChange={setEnableVerbTenses}
       />
       <Form.Separator></Form.Separator>
-      <Form.Checkbox id="enableSpeech" label="Enable Speech" value={enableSpeech} onChange={setEnableSpeech} />
+      <Form.Checkbox id="enableSpeech" label="Enable English Speech" value={enableSpeech} onChange={setEnableSpeech} />
     </Form>
   );
 }

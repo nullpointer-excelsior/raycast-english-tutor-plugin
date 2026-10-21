@@ -8,7 +8,8 @@ const BASE_PROMPT = `You are a translation assistant. Detect the language of the
 - If it is in English, translate it to Spanish.
 - If it is in Spanish, translate it to English.
 All explanations MUST be about english input or translation, DO NOT explain spanish language.
-The translation MUST be in the "translation" field.`;
+The translation MUST be in the "translation" field.
+Report the detected language of the source text in the "sourceLanguage" field ("english" or "spanish").`;
 
 const VOCABULARY_INSTRUCTION = `In the "vocabulary" field, provide a vocabulary breakdown in markdown of complex and uncommon words or phrases from the source text and their translations. Leave empty if not applicable.`;
 
@@ -17,6 +18,11 @@ const VERB_TENSES_INSTRUCTION = `In the "verbTenses" field, analyze and explain 
 export const GUIDED_TRANSLATION_SCHEMA = {
   type: "object",
   properties: {
+    sourceLanguage: {
+      type: "string",
+      enum: ["english", "spanish"],
+      description: "Detected language of the source text.",
+    },
     translation: {
       type: "string",
       description: "Direct translation of the source text into the target language.",
@@ -31,7 +37,7 @@ export const GUIDED_TRANSLATION_SCHEMA = {
       description: "Analysis of verb tenses used in the source text from english traslation or english input.",
     },
   },
-  required: ["translation", "vocabulary", "verbTenses"],
+  required: ["sourceLanguage", "translation", "vocabulary", "verbTenses"],
   additionalProperties: false,
 } as const;
 

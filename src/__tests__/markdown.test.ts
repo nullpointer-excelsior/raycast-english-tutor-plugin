@@ -80,12 +80,14 @@ describe("buildCorrectionsSpeechText", () => {
 });
 
 const FULL_GUIDED: GuidedTranslationModel = {
+  sourceLanguage: "english",
   translation: "Hola, ¿cómo estás?",
   vocabulary: "how are you -> cómo estás",
   verbTenses: "Present simple",
 };
 
 const EMPTY_SECTIONS_GUIDED: GuidedTranslationModel = {
+  sourceLanguage: "english",
   translation: "Hola",
   vocabulary: "",
   verbTenses: "",
