@@ -31,7 +31,7 @@
     },
     {
       "name": "speech",
-      "title": "Speech",
+      "title": "Speech to text",
       "description": "Convert the input text to speech using OpenAI TTS",
       "mode": "view"
     },
