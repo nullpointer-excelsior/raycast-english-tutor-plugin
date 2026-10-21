@@ -3,6 +3,7 @@ import { useState } from "react";
 import { APIError } from "openai";
 import { createOpenAIClient } from "./libs/openai-client";
 import { translateText } from "./libs/translation-service";
+import { TranslationResult } from "./libs/models/translation-result.model";
 import { SpeechTranslationDetail } from "./components/SpeechTranslationDetail";
 
 const TTS_MAX_CHARS = 4096;
@@ -25,9 +26,9 @@ export default function TextToSpeechCommand() {
     const toast = await showToast({ style: Toast.Style.Animated, title: "Translating text..." });
     const openai = createOpenAIClient();
 
-    let translatedText: string;
+    let result: TranslationResult;
     try {
-      translatedText = await translateText(openai, values.ttsInput);
+      result = await translateText(openai, values.ttsInput);
     } catch (err) {
       if (err instanceof APIError) {
         toast.style = Toast.Style.Failure;
@@ -43,7 +44,8 @@ export default function TextToSpeechCommand() {
     push(
       <SpeechTranslationDetail
         originalText={values.ttsInput}
-        translatedText={translatedText}
+        sourceLanguage={result.sourceLanguage}
+        translatedText={result.translation}
         enableSpeech={values.enableSpeech}
         openai={openai}
       />,
@@ -59,7 +61,7 @@ export default function TextToSpeechCommand() {
       }
     >
       <Form.TextArea id="ttsInput" title="Text" placeholder="Enter text to translate..." />
-      <Form.Checkbox id="enableSpeech" label="Enable Speech" value={enableSpeech} onChange={setEnableSpeech} />
+      <Form.Checkbox id="enableSpeech" label="Enable English Speech" value={enableSpeech} onChange={setEnableSpeech} />
     </Form>
   );
 }
