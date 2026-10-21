@@ -13,7 +13,7 @@ interface TtsFormValues {
   enableSpeech: boolean;
 }
 
-export default function TextToSpeechCommand() {
+export default function EnglishSpeechCommand() {
   const [enableSpeech, setEnableSpeech] = useState(true);
   const { push } = useNavigation();
 

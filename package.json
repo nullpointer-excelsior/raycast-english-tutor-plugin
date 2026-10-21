@@ -36,8 +36,8 @@
       "mode": "view"
     },
     {
-      "name": "text-to-speech",
-      "title": "Text to Speech",
+      "name": "english-speech",
+      "title": "Speech In English",
       "description": "Convert text to speech using OpenAI TTS",
       "mode": "view"
     },
