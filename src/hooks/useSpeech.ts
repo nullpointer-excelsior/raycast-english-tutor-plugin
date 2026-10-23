@@ -16,15 +16,21 @@ interface UseSpeechOptions {
 
 export function useSpeech({ openai, text, autoPlay }: UseSpeechOptions) {
   const hasPlayedRef = useRef(false);
+  const cachedTextRef = useRef<string | null>(null);
+  const cachedBufferRef = useRef<Buffer | null>(null);
+  const tmpFilePathRef = useRef<string | null>(null);
 
   async function handlePlaySpeech() {
-    const toast = await showToast({ style: Toast.Style.Animated, title: "Generating speech..." });
-    const tmpFilePath = path.join(os.tmpdir(), `tts-${Date.now()}.mp3`);
+    const isCached = cachedBufferRef.current !== null && cachedTextRef.current === text;
+    const toast = await showToast({
+      style: Toast.Style.Animated,
+      title: isCached ? "Playing with Marin's voice..." : "Generating speech...",
+    });
 
-    try {
-      let buffer: Buffer;
+    if (!isCached) {
       try {
-        buffer = await generateSpeech(openai, text);
+        cachedBufferRef.current = await generateSpeech(openai, text);
+        cachedTextRef.current = text;
       } catch (err) {
         if (err instanceof APIError) {
           toast.style = Toast.Style.Failure;
@@ -34,18 +40,20 @@ export function useSpeech({ openai, text, autoPlay }: UseSpeechOptions) {
         throw err;
       }
 
-      fs.writeFileSync(tmpFilePath, buffer);
-      toast.style = Toast.Style.Success;
-      toast.title = "Playing with Marin's voice...";
-
-      try {
-        await playAudio(tmpFilePath);
-      } catch {
-        toast.style = Toast.Style.Failure;
-        toast.title = "Failed to play audio.";
+      if (!tmpFilePathRef.current) {
+        tmpFilePathRef.current = path.join(os.tmpdir(), `tts-${Date.now()}.mp3`);
       }
-    } finally {
-      fs.rmSync(tmpFilePath, { force: true });
+      fs.writeFileSync(tmpFilePathRef.current, cachedBufferRef.current);
+    }
+
+    toast.style = Toast.Style.Success;
+    toast.title = "Playing with Marin's voice...";
+
+    try {
+      await playAudio(tmpFilePathRef.current!);
+    } catch {
+      toast.style = Toast.Style.Failure;
+      toast.title = "Failed to play audio.";
     }
   }
 
@@ -54,6 +62,15 @@ export function useSpeech({ openai, text, autoPlay }: UseSpeechOptions) {
       hasPlayedRef.current = true;
       handlePlaySpeech();
     }
+  }, []);
+
+  useEffect(() => {
+    const tmpFilePath = tmpFilePathRef.current;
+    return () => {
+      if (tmpFilePath) {
+        fs.rmSync(tmpFilePath, { force: true });
+      }
+    };
   }, []);
 
   return { handlePlaySpeech };
