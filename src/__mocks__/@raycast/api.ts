@@ -4,6 +4,13 @@ export const getPreferenceValues = jest.fn(() => ({ openaiApiKey: "test-api-key"
 
 export const showToast = jest.fn();
 export const showHUD = jest.fn();
+export const closeMainWindow = jest.fn(() => Promise.resolve());
+
+export const PopToRootType = {
+  Default: "default",
+  Immediate: "immediate",
+  Suspended: "suspended",
+};
 
 export const Toast = {
   Style: {
@@ -92,4 +99,4 @@ export const Form = Object.assign(
   },
 );
 
-export const Icon = { Speaker: "speaker", Checkmark: "checkmark" };
+export const Icon = { Speaker: "speaker", Checkmark: "checkmark", XmarkCircle: "xmark-circle" };

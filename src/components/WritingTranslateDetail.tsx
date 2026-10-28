@@ -1,6 +1,7 @@
 import { Action, ActionPanel, Detail, showHUD } from "@raycast/api";
 import { useWritingTranslate } from "../hooks/useWritingTranslate";
 import { buildWritingTranslateMarkdown } from "../libs/markdown";
+import { CloseAction } from "./CloseAction";
 
 interface WritingTranslateDetailProps {
   inputText: string;
@@ -22,6 +23,7 @@ export function WritingTranslateDetail({ inputText, onNew }: WritingTranslateDet
           <ActionPanel>
             <Action title="Retry" shortcut={{ modifiers: ["cmd"], key: "r" }} onAction={retry} />
             <Action title="New Translation" shortcut={{ modifiers: ["cmd"], key: "n" }} onAction={onNew} />
+            <CloseAction />
           </ActionPanel>
         }
       />
@@ -44,6 +46,7 @@ export function WritingTranslateDetail({ inputText, onNew }: WritingTranslateDet
             onCopy={() => showHUD("Translation Copied!")}
           />
           <Action title="New Translation" shortcut={{ modifiers: ["cmd"], key: "n" }} onAction={onNew} />
+          <CloseAction />
         </ActionPanel>
       }
     />

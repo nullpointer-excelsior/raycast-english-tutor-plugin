@@ -1,6 +1,7 @@
 import { Action, ActionPanel, Detail, Icon } from "@raycast/api";
 import OpenAI from "openai";
 import { useSpeech } from "../hooks/useSpeech";
+import { CloseAction } from "./CloseAction";
 
 interface SpeechDetailProps {
   text: string;
@@ -18,6 +19,7 @@ export function SpeechDetail({ text, autoPlay, openai }: SpeechDetailProps) {
         <ActionPanel>
           <Action title="Play Speech" icon={Icon.Speaker} onAction={handlePlaySpeech} />
           <Action.CopyToClipboard title="Copy Text" content={text} />
+          <CloseAction />
         </ActionPanel>
       }
     />

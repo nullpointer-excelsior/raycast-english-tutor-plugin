@@ -4,6 +4,7 @@ import { useGuidedTranslation } from "../hooks/useGuidedTranslation";
 import { useSpeech } from "../hooks/useSpeech";
 import { buildGuidedTranslationMarkdown } from "../libs/markdown";
 import { GuidedTranslationModel } from "../libs/models/guided-translation.model";
+import { CloseAction } from "./CloseAction";
 
 interface GuidedTranslationDetailProps {
   inputText: string;
@@ -31,6 +32,7 @@ function GuidedTranslationSuccess({ model, inputText, enableSpeech }: GuidedTran
         <ActionPanel>
           <Action.CopyToClipboard title="Copy Translation" content={model.translation} />
           <Action title="Play English Speech" icon={Icon.Speaker} onAction={handlePlaySpeech} />
+          <CloseAction />
         </ActionPanel>
       }
     />
@@ -58,6 +60,7 @@ export function GuidedTranslationDetail({
           <ActionPanel>
             <Action title="Retry" shortcut={{ modifiers: ["cmd"], key: "r" }} onAction={retry} />
             <Action title="Translate New Text" onAction={onTranslateNew} />
+            <CloseAction />
           </ActionPanel>
         }
       />

@@ -4,6 +4,7 @@ import { useTutor } from "../hooks/useTutor";
 import { useSpeech } from "../hooks/useSpeech";
 import { buildTutorMarkdown, buildCorrectionsSpeechText } from "../libs/markdown";
 import { createOpenAIClient } from "../libs/openai-client";
+import { CloseAction } from "./CloseAction";
 
 interface TutorResultDetailProps {
   inputContext: string;
@@ -38,6 +39,7 @@ export function TutorResultDetail({ inputContext, inputText, onAnalyzeNew }: Tut
           <ActionPanel>
             <Action title="Retry" shortcut={{ modifiers: ["cmd"], key: "r" }} onAction={retry} />
             <Action title="Analyze New Text" shortcut={{ modifiers: ["cmd"], key: "n" }} onAction={onAnalyzeNew} />
+            <CloseAction />
           </ActionPanel>
         }
       />
@@ -67,6 +69,7 @@ export function TutorResultDetail({ inputContext, inputText, onAnalyzeNew }: Tut
             onAction={handlePlayCorrectionsSpeech}
           />
           <Action title="Analyze New Text" shortcut={{ modifiers: ["cmd"], key: "n" }} onAction={onAnalyzeNew} />
+          <CloseAction />
         </ActionPanel>
       }
     />
